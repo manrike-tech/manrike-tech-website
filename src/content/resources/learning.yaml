@@ -1,0 +1,20 @@
+title: Learning roadmaps
+description: Structured learning paths for infrastructure and DevOps roles.
+category: learning
+order: 110
+items:
+  - name: DevOps roadmap
+    url: https://roadmap.sh/devops
+    description: Community-maintained, interactive roadmap of DevOps skills and tools.
+    type: course
+    labels: [free, open-source]
+  - name: Linux Foundation training and certification
+    url: https://training.linuxfoundation.org/
+    description: Courses and certifications for Linux, Kubernetes and cloud-native technologies.
+    type: course
+    labels: [official]
+  - name: Microsoft Learn training
+    url: https://learn.microsoft.com/en-us/training/
+    description: Free learning paths and certification preparation for Microsoft technologies.
+    type: course
+    labels: [free, official]

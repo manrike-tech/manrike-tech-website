@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/urls';
+---
+
+<BaseLayout title="Page not found" description="The requested page does not exist." noindex>
+  <div class="container page">
+    <header class="page-header">
+      <p class="eyebrow">$ cd: no such file or directory</p>
+      <h1>404: page not found</h1>
+      <p>The page may have moved or never existed.</p>
+    </header>
+    <div class="hero-actions">
+      <a class="button button-primary" href={url('/search/')}>
+        Search the site
+      </a>
+      <a class="button" href={url('/')}>
+        Home
+      </a>
+      <a class="button" href={url('/categories/')}>
+        Categories
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

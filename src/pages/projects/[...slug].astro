@@ -1,0 +1,123 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ProjectBadges from '../../components/ProjectBadges.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import { getCategories, getNotes, getPosts, getProjects } from '../../lib/content';
+import { relatedEntries } from '../../lib/content-utils';
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { data } = project;
+const { Content, headings } = await render(project);
+
+const categories = await getCategories();
+const category = categories.byId.get(data.category.id);
+const relatedPosts = relatedEntries(
+  project,
+  await getPosts(),
+  data.relatedPosts.map((r) => r.id),
+  2,
+);
+const relatedNotes = relatedEntries(
+  project,
+  await getNotes(),
+  data.relatedNotes.map((r) => r.id),
+  2,
+);
+---
+
+<ArticleLayout
+  title={data.title}
+  description={data.description}
+  searchType="Projects"
+  schemaType="CreativeWork"
+  breadcrumbs={[{ label: 'Projects', href: '/projects/' }, { label: data.title }]}
+  published={data.published}
+  updated={data.updated}
+  category={category}
+  tags={data.tags}
+  headings={headings}
+  cover={data.cover}
+  coverAlt={data.coverAlt}
+  draft={data.draft}
+  sourcePath={project.filePath}
+>
+  <div slot="meta" class="project-facts">
+    <div class="meta">
+      <ProjectBadges environment={data.environment} status={data.status} />
+    </div>
+    <dl>
+      {data.stack.length > 0 && (
+        <>
+          <dt>Stack</dt>
+          <dd class="mono">{data.stack.join(' · ')}</dd>
+        </>
+      )}
+      {data.repository && (
+        <>
+          <dt>Repository</dt>
+          <dd>
+            <a href={data.repository}>{data.repository.replace(/^https:\/\//, '')}</a>
+          </dd>
+        </>
+      )}
+      {data.website && (
+        <>
+          <dt>Website</dt>
+          <dd>
+            <a href={data.website}>{data.website.replace(/^https:\/\//, '')}</a>
+          </dd>
+        </>
+      )}
+    </dl>
+  </div>
+
+  <Content />
+
+  {data.limitations.length > 0 && (
+    <>
+      <h2 id="known-limitations">Known limitations</h2>
+      <ul>
+        {data.limitations.map((l) => (
+          <li>{l}</li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  <RelatedContent slot="after" posts={relatedPosts} notes={relatedNotes} />
+</ArticleLayout>
+
+<style>
+  .project-facts {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-3) 0 0;
+    font-size: var(--step--1);
+  }
+
+  dt {
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+</style>

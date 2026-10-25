@@ -1,0 +1,20 @@
+title: Proxmox & virtualization
+description: Official documentation for Proxmox VE and Proxmox Backup Server.
+category: virtualization
+order: 20
+items:
+  - name: Proxmox VE documentation
+    url: https://pve.proxmox.com/pve-docs/
+    description: Administration guide and manual pages for Proxmox Virtual Environment.
+    type: documentation
+    labels: [free, official]
+  - name: Proxmox VE wiki
+    url: https://pve.proxmox.com/wiki/Main_Page
+    description: Community and vendor wiki with how-to articles and upgrade guides.
+    type: documentation
+    labels: [free, official]
+  - name: Proxmox Backup Server documentation
+    url: https://pbs.proxmox.com/docs/
+    description: Documentation for deduplicating, incremental backups of VMs, containers and hosts.
+    type: documentation
+    labels: [free, official]

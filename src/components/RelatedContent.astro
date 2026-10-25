@@ -1,0 +1,27 @@
+---
+import type { Note, Post } from '../lib/content';
+import PostCard from './PostCard.astro';
+import NoteCard from './NoteCard.astro';
+
+interface Props {
+  posts?: Post[];
+  notes?: Note[];
+}
+const { posts = [], notes = [] } = Astro.props;
+---
+
+{(posts.length > 0 || notes.length > 0) && (
+  <aside class="related section" aria-labelledby="related-title">
+    <div class="section-header">
+      <h2 id="related-title">Related</h2>
+    </div>
+    <div class="grid">
+      {posts.map((post) => (
+        <PostCard post={post} />
+      ))}
+      {notes.map((note) => (
+        <NoteCard note={note} />
+      ))}
+    </div>
+  </aside>
+)}

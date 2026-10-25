@@ -1,0 +1,16 @@
+---
+import type { Project } from '../lib/content';
+
+interface Props {
+  environment: Project['data']['environment'];
+  status: Project['data']['status'];
+  draft?: boolean;
+}
+const { environment, status, draft } = Astro.props;
+---
+
+<span class:list={['badge', environment === 'production' ? 'badge-accent' : 'badge-warn']}>
+  {environment === 'production' ? 'production' : 'lab'}
+</span>
+<span class="badge">status: {status}</span>
+{draft && <span class="badge badge-warn">draft</span>}

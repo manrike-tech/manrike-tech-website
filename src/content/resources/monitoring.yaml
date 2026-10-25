@@ -1,0 +1,60 @@
+title: Monitoring & observability
+description: Documentation and tooling for Zabbix, Prometheus and Grafana.
+category: monitoring
+order: 65
+items:
+  - name: Zabbix documentation
+    url: https://www.zabbix.com/documentation/current/en/manual
+    description: Official manual for the current Zabbix release, covering server, proxy, agents, templates and triggers.
+    type: documentation
+    labels: [free, official]
+  - name: Zabbix source repository
+    url: https://github.com/zabbix/zabbix
+    description: Zabbix source code, published by Zabbix on GitHub.
+    type: repository
+    labels: [open-source, official]
+  - name: Zabbix integrations and templates
+    url: https://www.zabbix.com/integrations
+    description: Catalogue of official and community templates and integrations for monitoring systems and services.
+    type: reference
+    labels: [free, official]
+  - name: Zabbix training program
+    url: https://www.zabbix.com/training
+    description: Official instructor-led Zabbix courses and certifications.
+    type: certification
+    labels: [paid, official]
+  - name: Prometheus documentation
+    url: https://prometheus.io/docs/introduction/overview/
+    description: Concepts, configuration, PromQL querying and best practices for Prometheus.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: Alertmanager documentation
+    url: https://prometheus.io/docs/alerting/latest/alertmanager/
+    description: Grouping, inhibition, silencing and routing of alerts fired by Prometheus.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: Prometheus node_exporter
+    url: https://github.com/prometheus/node_exporter
+    description: Official exporter for hardware and operating system metrics on Linux and Unix hosts.
+    type: tool
+    labels: [free, open-source, official]
+  - name: Prometheus source repository
+    url: https://github.com/prometheus/prometheus
+    description: Source code, releases and issue tracker for the Prometheus server.
+    type: repository
+    labels: [open-source, official]
+  - name: Grafana documentation
+    url: https://grafana.com/docs/grafana/latest/
+    description: Dashboards, data sources, alerting and administration for Grafana.
+    type: documentation
+    labels: [free, official]
+  - name: Grafana source repository
+    url: https://github.com/grafana/grafana
+    description: Source code and releases for Grafana.
+    type: repository
+    labels: [open-source, official]
+  - name: Grafana dashboards
+    url: https://grafana.com/grafana/dashboards/
+    description: Library of official and community dashboards that can be imported into Grafana.
+    type: reference
+    labels: [free, official]

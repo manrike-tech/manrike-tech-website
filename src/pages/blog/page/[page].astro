@@ -1,0 +1,25 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BlogListing from '../../../components/BlogListing.astro';
+import { getPosts } from '../../../lib/content';
+import { paginate } from '../../../lib/content-utils';
+import { siteConfig } from '../../../site.config';
+
+// Page 1 is served by /blog/; this route renders pages 2..n.
+export const getStaticPaths = (async () => {
+  const pages = paginate(await getPosts(), siteConfig.postsPerPage);
+  return pages
+    .slice(1)
+    .map((page) => ({ params: { page: String(page.current) }, props: { page } }));
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<BlogListing
+  title="Blog"
+  description="Tutorials, troubleshooting write-ups, architecture decisions and technical experiments."
+  posts={page.items}
+  breadcrumbs={[{ label: 'Blog', href: '/blog/' }, { label: `Page ${page.current}` }]}
+  pagination={{ current: page.current, total: page.total, base: '/blog/' }}
+/>

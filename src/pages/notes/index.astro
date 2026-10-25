@@ -1,0 +1,117 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import NotesTree from '../../components/NotesTree.astro';
+import { getCategories, getNotes, noteKindLabel } from '../../lib/content';
+import { url } from '../../lib/urls';
+
+const notes = await getNotes();
+const categories = await getCategories();
+const populated = new Set<string>();
+for (const n of notes) for (const c of categories.path(n.data.category.id)) populated.add(c.id);
+const recent = notes.slice(0, 4);
+---
+
+<BaseLayout
+  title="Knowledge base"
+  description="Short technical notes, command references and troubleshooting guides, organized by category."
+>
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Notes' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ tree ~/notes</p>
+      <h1>Knowledge base</h1>
+      <p>
+        Short, focused notes kept up to date. For step-by-step explanations, see the
+        <a href={url('/blog/')}>tutorials on the blog</a>.
+      </p>
+    </header>
+
+    <form class="notes-search" action={url('/search/')} method="get" role="search">
+      <label class="visually-hidden" for="notes-search-input">
+        Search notes
+      </label>
+      <input
+        id="notes-search-input"
+        class="input"
+        type="search"
+        name="q"
+        placeholder="Search notes…"
+      />
+      <input type="hidden" name="type" value="Notes" />
+      <button class="button" type="submit">
+        Search
+      </button>
+    </form>
+
+    <dl class="legend">
+      {Object.entries(noteKindLabel).map(([kind, label]) => (
+        <div>
+          <dt>
+            <span class="badge badge-accent">{label}</span>
+          </dt>
+          <dd>
+            {kind === 'quick-note' && 'A short answer to one question.'}
+            {kind === 'cheatsheet' && 'Commands and options at a glance.'}
+            {kind === 'troubleshooting' && 'Symptoms, causes and fixes.'}
+          </dd>
+        </div>
+      ))}
+    </dl>
+
+    {notes.length === 0 ? (
+      <p class="empty-state">No notes published yet.</p>
+    ) : (
+      <div class="with-sidebar">
+        <div>
+          <NotesTree nodes={categories.tree} notes={notes} populated={populated} />
+        </div>
+        <aside aria-labelledby="recent-notes">
+          <h2 id="recent-notes" class="mono aside-title">
+            Recently updated
+          </h2>
+          <div class="stack">
+            {recent.map((note) => (
+              <NoteCard note={note} compact />
+            ))}
+          </div>
+        </aside>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .notes-search {
+    display: flex;
+    gap: var(--space-2);
+    max-width: 32rem;
+    margin-bottom: var(--space-5);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: 0 0 var(--space-4);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .legend div {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .legend dd {
+    margin: 0;
+  }
+
+  .aside-title {
+    font-size: var(--step-0);
+    color: var(--text-muted);
+    margin-top: var(--space-5);
+  }
+</style>

@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogFilters from '../../components/BlogFilters.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getPosts } from '../../lib/content';
+import { tagCounts } from '../../lib/content-utils';
+import { url } from '../../lib/urls';
+
+const tags = tagCounts(await getPosts());
+---
+
+<BaseLayout title="Tags" description="All tags used in blog articles.">
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Blog', href: '/blog/' }, { label: 'Tags' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ ls ~/blog/tags</p>
+      <h1>Tags</h1>
+      <p>Browse articles by topic.</p>
+    </header>
+    <BlogFilters />
+    {tags.length > 0 ? (
+      <ul class="tag-cloud">
+        {tags.map(({ tag, count }) => (
+          <li>
+            <a class="tag" href={url(`/blog/tag/${tag}/`)}>
+              {tag}
+            </a>
+            <span class="muted mono"> ({count})</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="empty-state">No tags yet.</p>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-cloud {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: var(--space-2) var(--space-4);
+    list-style: none;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+</style>

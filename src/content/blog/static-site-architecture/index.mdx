@@ -1,0 +1,59 @@
+---
+title: 'ADR: a static, Git-based architecture for this site'
+description: Why Manrike-Tech is a statically generated Astro site with content in Git, a build-time search index and no backend.
+published: 2026-10-25
+category: architecture
+tags: [architecture, adr, astro, static-site]
+kind: architecture
+featured: true
+---
+
+import BuildPipeline from './build-pipeline.svg';
+
+## Context
+
+This site publishes technical articles, short notes, curated resources,
+project write-ups and a CV. Requirements that drive the architecture:
+
+- Content must be editable as plain files in a Git repository and reviewed
+  through pull requests.
+- Pages must load fast and remain readable without JavaScript.
+- Operating it should not require patching servers, databases or a CMS.
+- Search should work across all content types.
+
+## Decision
+
+Generate the whole site at build time with [Astro](https://astro.build/) and
+serve it as static files.
+
+<figure>
+  <BuildPipeline role="img" aria-label="Build pipeline: Git repository to astro build to pagefind to static hosting, all run by GitHub Actions." />
+  <figcaption>Build and deployment pipeline.</figcaption>
+</figure>
+
+- **Content collections** validate frontmatter against schemas, so a typo in
+  a category or a missing field fails the build instead of publishing a
+  broken page.
+- **Categories live in data**, not code: adding one is a YAML change.
+- **Search** uses [Pagefind](https://pagefind.app/), which indexes the
+  generated HTML after the build and runs entirely in the browser.
+- **Interactivity** (theme switch, copy buttons, search UI, mobile menu) is
+  implemented as small native Web Components; no UI framework is shipped.
+- **Styling** uses plain CSS with design tokens (custom properties).
+
+## Consequences
+
+- No runtime attack surface beyond the static host itself.
+- Any static host works; the deployment target is a configuration detail.
+- Search is unavailable in `astro dev` until a production build has
+  generated the index.
+- Features that need server state (comments, forms) would require a
+  third-party service or a separate decision.
+
+## Alternatives considered
+
+| Option              | Why not                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| WordPress or a CMS  | Database and PHP runtime to patch; content outside Git.    |
+| Single-page app     | More JavaScript, worse SEO, no benefit for static content. |
+| Hosted search (SaaS)| External dependency and data processing for a small index. |

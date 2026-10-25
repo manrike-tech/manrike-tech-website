@@ -1,0 +1,26 @@
+---
+import { url } from '../lib/urls';
+
+interface Props {
+  tags: string[];
+  /** Base route for tag links; tags are plain text when omitted. */
+  base?: string;
+}
+const { tags, base } = Astro.props;
+---
+
+{tags.length > 0 && (
+  <ul class="tag-list" aria-label="Tags">
+    {tags.map((t) => (
+      <li>
+        {base ? (
+          <a class="tag" href={url(`${base}${t}/`)}>
+            {t}
+          </a>
+        ) : (
+          <span class="tag">{t}</span>
+        )}
+      </li>
+    ))}
+  </ul>
+)}

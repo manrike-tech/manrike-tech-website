@@ -1,0 +1,17 @@
+---
+import BlogListing from '../../components/BlogListing.astro';
+import { getPosts } from '../../lib/content';
+import { paginate } from '../../lib/content-utils';
+import { siteConfig } from '../../site.config';
+
+const pages = paginate(await getPosts(), siteConfig.postsPerPage);
+const first = pages[0]!;
+---
+
+<BlogListing
+  title="Blog"
+  description="Tutorials, troubleshooting write-ups, architecture decisions and technical experiments."
+  posts={first.items}
+  breadcrumbs={[{ label: 'Blog' }]}
+  pagination={{ current: 1, total: first.total, base: '/blog/' }}
+/>

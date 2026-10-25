@@ -1,0 +1,288 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { url } from '../lib/urls';
+
+const types = ['Blog', 'Notes', 'Projects', 'Resources'];
+---
+
+<BaseLayout title="Search" description="Search articles, notes, projects and resources." noindex>
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Search' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ grep -ri</p>
+      <h1>Search</h1>
+    </header>
+
+    <site-search data-bundle={url('/pagefind/pagefind.js')} data-base={url('/')}>
+      <form class="search-form" role="search" action="" method="get">
+        <label class="visually-hidden" for="search-input">
+          Search query
+        </label>
+        <input
+          id="search-input"
+          class="input"
+          type="search"
+          name="q"
+          placeholder="e.g. ssh hardening, journalctl, crashloop"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <fieldset class="search-types">
+          <legend class="visually-hidden">Content type</legend>
+          <label>
+            <input type="radio" name="type" value="" checked /> all
+          </label>
+          {types.map((t) => (
+            <label>
+              <input type="radio" name="type" value={t} /> {t.toLowerCase()}
+              <span class="count mono" data-count={t} />
+            </label>
+          ))}
+        </fieldset>
+        <noscript>
+          <p class="notice">
+            Search needs JavaScript. Browse <a href={url('/categories/')}>categories</a> instead.
+          </p>
+        </noscript>
+      </form>
+
+      <p class="status mono muted" role="status" aria-live="polite" data-status></p>
+      <ol class="results" data-results></ol>
+
+      <div class="empty-state" data-empty hidden>
+        <p>
+          <strong>No results.</strong> Try fewer or different words, or remove the type filter.
+        </p>
+        <p>
+          You can also browse <a href={url('/categories/')}>categories</a>,
+          <a href={url('/blog/tags/')}>tags</a> or the <a href={url('/notes/')}>knowledge base</a>.
+        </p>
+      </div>
+    </site-search>
+  </div>
+</BaseLayout>
+
+<script>
+  interface PagefindResultData {
+    url: string;
+    excerpt: string;
+    meta: { title?: string };
+    filters: Record<string, string[]>;
+  }
+  interface PagefindApi {
+    options(opts: Record<string, unknown>): Promise<void>;
+    init(): Promise<void>;
+    filters(): Promise<Record<string, Record<string, number>>>;
+    debouncedSearch(
+      term: string,
+      opts?: Record<string, unknown>,
+      ms?: number,
+    ): Promise<{ results: { data(): Promise<PagefindResultData> }[] } | null>;
+  }
+
+  const MAX_RESULTS = 25;
+
+  /** Renders Pagefind's excerpt keeping only text and <mark>, never raw HTML. */
+  function safeExcerpt(html: string): DocumentFragment {
+    const fragment = document.createDocumentFragment();
+    const parsed = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
+    for (const node of parsed.body.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        fragment.append(node.textContent ?? '');
+      } else if (node instanceof HTMLElement && node.tagName === 'MARK') {
+        const mark = document.createElement('mark');
+        mark.textContent = node.textContent;
+        fragment.append(mark);
+      } else {
+        fragment.append(node.textContent ?? '');
+      }
+    }
+    return fragment;
+  }
+
+  class SiteSearch extends HTMLElement {
+    private pagefind?: PagefindApi;
+    private input!: HTMLInputElement;
+    private status!: HTMLElement;
+    private results!: HTMLOListElement;
+    private empty!: HTMLElement;
+
+    async connectedCallback() {
+      this.input = this.querySelector('#search-input')!;
+      this.status = this.querySelector('[data-status]')!;
+      this.results = this.querySelector('[data-results]')!;
+      this.empty = this.querySelector('[data-empty]')!;
+      const form = this.querySelector('form')!;
+
+      const params = new URLSearchParams(location.search);
+      this.input.value = params.get('q') ?? '';
+      const type = params.get('type') ?? '';
+      const radio = this.querySelector<HTMLInputElement>(
+        `input[name="type"][value="${CSS.escape(type)}"]`,
+      );
+      if (radio) radio.checked = true;
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        void this.run();
+      });
+      this.input.addEventListener('input', () => void this.run());
+      form.addEventListener('change', () => void this.run());
+
+      try {
+        // The index only exists after `npm run build`; keep Vite from bundling it.
+        const bundle = this.dataset.bundle!;
+        this.pagefind = (await import(/* @vite-ignore */ bundle)) as PagefindApi;
+        await this.pagefind.options({ baseUrl: this.dataset.base });
+        await this.pagefind.init();
+        await this.showCounts();
+      } catch {
+        this.status.textContent =
+          'Search index not found. It is generated by a production build: run "npm run build" and "npm run preview".';
+        return;
+      }
+      if (this.input.value) await this.run();
+      else this.input.focus();
+    }
+
+    private selectedType(): string {
+      return this.querySelector<HTMLInputElement>('input[name="type"]:checked')?.value ?? '';
+    }
+
+    private async showCounts() {
+      const filters = await this.pagefind!.filters();
+      for (const el of this.querySelectorAll<HTMLElement>('[data-count]')) {
+        const n = filters.type?.[el.dataset.count!] ?? 0;
+        el.textContent = `(${n})`;
+      }
+    }
+
+    private updateUrl(term: string, type: string) {
+      const params = new URLSearchParams();
+      if (term) params.set('q', term);
+      if (type) params.set('type', type);
+      const query = params.toString();
+      history.replaceState(null, '', query ? `?${query}` : location.pathname);
+    }
+
+    private async run() {
+      if (!this.pagefind) return;
+      const term = this.input.value.trim();
+      const type = this.selectedType();
+      this.updateUrl(term, type);
+
+      if (!term) {
+        this.results.replaceChildren();
+        this.empty.hidden = true;
+        this.status.textContent = '';
+        return;
+      }
+
+      const search = await this.pagefind.debouncedSearch(
+        term,
+        type ? { filters: { type } } : {},
+        250,
+      );
+      if (search === null) return; // superseded by a newer query
+
+      const data = await Promise.all(search.results.slice(0, MAX_RESULTS).map((r) => r.data()));
+      this.results.replaceChildren(...data.map((d) => this.renderResult(d)));
+      this.empty.hidden = data.length > 0;
+      const total = search.results.length;
+      this.status.textContent =
+        total === 0
+          ? `No results for "${term}"`
+          : `${total} result${total === 1 ? '' : 's'} for "${term}"${total > MAX_RESULTS ? `, showing ${MAX_RESULTS}` : ''}`;
+    }
+
+    private renderResult(d: PagefindResultData): HTMLLIElement {
+      const li = document.createElement('li');
+      li.className = 'result';
+      const type = document.createElement('span');
+      type.className = 'badge badge-accent';
+      type.textContent = d.filters.type?.[0] ?? 'Page';
+      const heading = document.createElement('h2');
+      const link = document.createElement('a');
+      link.href = d.url;
+      link.textContent = d.meta.title ?? d.url;
+      heading.append(link);
+      const excerpt = document.createElement('p');
+      excerpt.append(safeExcerpt(d.excerpt));
+      li.append(type, heading, excerpt);
+      return li;
+    }
+  }
+  customElements.define('site-search', SiteSearch);
+</script>
+
+<style>
+  .search-form {
+    max-width: var(--prose-width);
+  }
+
+  .search-form .input {
+    font-size: var(--step-1);
+  }
+
+  .search-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    border: 0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .search-types label {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .search-types input {
+    accent-color: var(--accent);
+  }
+
+  .count {
+    color: var(--text-faint);
+  }
+
+  .status {
+    margin-top: var(--space-5);
+    font-size: 0.875rem;
+  }
+
+  .results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: var(--prose-width);
+  }
+
+  .results :global(.result) {
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results :global(h2) {
+    font-size: var(--step-1);
+    margin: var(--space-2) 0 var(--space-1);
+  }
+
+  .results :global(p) {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+    margin: 0;
+  }
+
+  .results :global(mark) {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-radius: 2px;
+    padding: 0 0.1em;
+  }
+</style>

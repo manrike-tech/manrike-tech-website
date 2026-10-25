@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BlogFilters from './BlogFilters.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import Pagination from './Pagination.astro';
+import PostCard from './PostCard.astro';
+import type { Post } from '../lib/content';
+
+interface Props {
+  title: string;
+  description: string;
+  posts: Post[];
+  breadcrumbs: { label: string; href?: string }[];
+  pagination?: { current: number; total: number; base: string };
+  /** Document title when it should differ from the visible heading. */
+  metaTitle?: string;
+}
+const { title, description, posts, breadcrumbs, pagination, metaTitle = title } = Astro.props;
+const pageTitle =
+  pagination && pagination.current > 1 ? `${metaTitle} (page ${pagination.current})` : metaTitle;
+---
+
+<BaseLayout title={pageTitle} description={description}>
+  <div class="container page">
+    <Breadcrumbs items={breadcrumbs} />
+    <header class="page-header">
+      <p class="eyebrow">$ ls ~/blog</p>
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </header>
+    <BlogFilters />
+    {posts.length > 0 ? (
+      <div class="stack">
+        {posts.map((post) => (
+          <PostCard post={post} headingLevel="h2" />
+        ))}
+      </div>
+    ) : (
+      <p class="empty-state">No articles here yet.</p>
+    )}
+    {pagination && <Pagination {...pagination} />}
+  </div>
+</BaseLayout>

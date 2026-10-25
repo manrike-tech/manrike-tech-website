@@ -1,0 +1,13 @@
+# Copy to src/content/resources/<group>.yaml. Each file is one group on /resources/.
+# Only add links you have verified; prefer official sources.
+title: Group title
+description: What this group of resources covers.
+category: tools                 # id from src/content/categories.yaml
+order: 100                      # lower appears first
+draft: true
+items:
+  - name: Resource name
+    url: https://example.com/   # https only
+    description: One sentence on what it is and why it is useful.
+    type: documentation         # tool | documentation | repository | course | certification | reference
+    labels: [free, official]    # any of: free, paid, open-source, official

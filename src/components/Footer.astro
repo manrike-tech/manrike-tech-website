@@ -1,0 +1,98 @@
+---
+import { navigation, siteConfig } from '../site.config';
+import { url } from '../lib/urls';
+import SocialLinks from './SocialLinks.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div>
+      <p class="mono footer-brand">
+        manrike<span>-tech</span>
+      </p>
+      <p class="muted">{siteConfig.tagline}</p>
+      <SocialLinks />
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        {navigation.map((item) => (
+          <li>
+            <a href={url(item.href)}>{item.label}</a>
+          </li>
+        ))}
+        <li>
+          <a href={url('/categories/')}>Categories</a>
+        </li>
+        <li>
+          <a href={url('/contact/')}>Contact</a>
+        </li>
+        <li>
+          <a href={url('/rss.xml')}>RSS</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container footer-bottom">
+    <p>
+      © {year}
+      {siteConfig.author.name || siteConfig.name}. Built with Astro.
+      <a href={siteConfig.repository}>Source</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--border);
+    background: var(--bg-elevated);
+    font-size: var(--step--1);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+  }
+
+  .footer-brand {
+    font-weight: 700;
+    margin-bottom: var(--space-1);
+  }
+
+  .footer-brand span {
+    color: var(--accent);
+  }
+
+  nav ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(8rem, auto));
+    gap: var(--space-2) var(--space-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+  }
+
+  .footer-bottom {
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+  }
+
+  .footer-bottom p {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,35 @@
+title: Networking & firewalls
+description: Firewall and network tooling documentation, including OPNsense and FortiGate.
+category: networking
+order: 30
+items:
+  - name: OPNsense documentation
+    url: https://docs.opnsense.org/
+    description: Official manual for the OPNsense firewall and routing platform.
+    type: documentation
+    labels: [free, official]
+  - name: OPNsense core repository
+    url: https://github.com/opnsense/core
+    description: Source code of the OPNsense GUI and system components.
+    type: repository
+    labels: [open-source, official]
+  - name: Wireshark user's guide
+    url: https://www.wireshark.org/docs/wsug_html_chunked/
+    description: Guide to capturing and analyzing network traffic with Wireshark.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: FortiGate / FortiOS documentation
+    url: https://docs.fortinet.com/product/fortigate
+    description: Fortinet Document Library for FortiGate firewalls and FortiOS administration.
+    type: documentation
+    labels: [free, official]
+  - name: Fortinet Community
+    url: https://community.fortinet.com/
+    description: Fortinet knowledge base articles and community forums, including FortiGate technical tips.
+    type: reference
+    labels: [free, official]
+  - name: Fortinet Training Institute
+    url: https://training.fortinet.com/
+    description: Fortinet's training platform for FortiGate courses and certification preparation.
+    type: course
+    labels: [official]

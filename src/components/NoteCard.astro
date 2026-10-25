@@ -1,0 +1,33 @@
+---
+import type { Note } from '../lib/content';
+import { noteKindLabel } from '../lib/content';
+import { lastModified } from '../lib/content-utils';
+import { formatDate, isoDate, url } from '../lib/urls';
+
+interface Props {
+  note: Note;
+  compact?: boolean;
+}
+const { note, compact = false } = Astro.props;
+const modified = lastModified(note);
+---
+
+<article class:list={['card', { compact }]}>
+  <div class="meta">
+    <span class="badge badge-accent">{noteKindLabel[note.data.kind]}</span>
+    <span>
+      updated <time datetime={isoDate(modified)}>{formatDate(modified)}</time>
+    </span>
+    {note.data.draft && <span class="badge badge-warn">draft</span>}
+  </div>
+  <h3>
+    <a href={url(`/notes/${note.id}/`)}>{note.data.title}</a>
+  </h3>
+  {!compact && <p>{note.data.description}</p>}
+</article>
+
+<style>
+  .compact {
+    padding: var(--space-3) var(--space-4);
+  }
+</style>

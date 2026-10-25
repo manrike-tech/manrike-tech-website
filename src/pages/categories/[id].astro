@@ -1,0 +1,117 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import PostCard from '../../components/PostCard.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import {
+  getCategories,
+  getNotes,
+  getPosts,
+  getProjects,
+  getResourceGroups,
+} from '../../lib/content';
+import { url } from '../../lib/urls';
+
+export const getStaticPaths = (async () => {
+  const categories = await getCategories();
+  return categories.list.map((category) => ({ params: { id: category.id }, props: { category } }));
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.props;
+const categories = await getCategories();
+const ids = categories.descendants(category.id);
+const inCategory = (e: { data: { category: { id: string } } }) => ids.has(e.data.category.id);
+
+const posts = (await getPosts()).filter(inCategory);
+const notes = (await getNotes()).filter(inCategory);
+const projects = (await getProjects()).filter(inCategory);
+const resources = (await getResourceGroups()).filter(inCategory);
+const children = categories.list.filter((c) => c.parent === category.id);
+const path = categories.path(category.id);
+const isEmpty = posts.length + notes.length + projects.length + resources.length === 0;
+---
+
+<BaseLayout title={category.title} description={category.description}>
+  <div class="container page">
+    <Breadcrumbs
+      items={[
+        { label: 'Categories', href: '/categories/' },
+        ...path.slice(0, -1).map((c) => ({ label: c.title, href: `/categories/${c.id}/` })),
+        { label: category.title },
+      ]}
+    />
+    <header class="page-header">
+      <p class="eyebrow">$ cd ~/categories/{category.id}</p>
+      <h1>{category.title}</h1>
+      <p>{category.description}</p>
+    </header>
+
+    {children.length > 0 && (
+      <nav aria-label="Subcategories">
+        <ul class="filter-bar">
+          {children.map((c) => (
+            <li>
+              <a href={url(`/categories/${c.id}/`)}>{c.title}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+
+    {isEmpty && <p class="empty-state">Nothing published in this category yet.</p>}
+
+    {posts.length > 0 && (
+      <section class="section" aria-labelledby="posts">
+        <div class="section-header">
+          <h2 id="posts">Articles</h2>
+        </div>
+        <div class="grid">
+          {posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      </section>
+    )}
+    {notes.length > 0 && (
+      <section class="section" aria-labelledby="notes">
+        <div class="section-header">
+          <h2 id="notes">Notes</h2>
+        </div>
+        <div class="grid">
+          {notes.map((note) => (
+            <NoteCard note={note} />
+          ))}
+        </div>
+      </section>
+    )}
+    {projects.length > 0 && (
+      <section class="section" aria-labelledby="projects">
+        <div class="section-header">
+          <h2 id="projects">Projects</h2>
+        </div>
+        <div class="grid">
+          {projects.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      </section>
+    )}
+    {resources.length > 0 && (
+      <section class="section" aria-labelledby="resources">
+        <div class="section-header">
+          <h2 id="resources">Resources</h2>
+        </div>
+        <ul>
+          {resources.map((g) => (
+            <li>
+              <a href={url(`/resources/#${g.id}`)}>{g.data.title}</a>
+              <span class="muted"> ({g.data.items.length})</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </div>
+</BaseLayout>

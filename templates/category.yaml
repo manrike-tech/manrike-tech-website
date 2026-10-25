@@ -1,0 +1,6 @@
+# Append to src/content/categories.yaml
+- id: new-category              # lowercase kebab-case, used in URLs
+  title: New Category
+  description: One sentence describing the category.
+  parent: linux                 # optional: makes it a subcategory
+  order: 100

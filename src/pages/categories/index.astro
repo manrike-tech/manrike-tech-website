@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCategories } from '../../lib/content';
+import { url } from '../../lib/urls';
+
+const { tree } = await getCategories();
+---
+
+<BaseLayout
+  title="Categories"
+  description="All technology areas and subcategories covered on this site."
+>
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Categories' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ ls ~/categories</p>
+      <h1>Categories</h1>
+      <p>Every article, note, project and resource belongs to one of these areas.</p>
+    </header>
+    <div class="grid">
+      {tree.map((node) => (
+        <section class="card">
+          <h2>
+            <a href={url(`/categories/${node.id}/`)}>{node.title}</a>
+          </h2>
+          <p>{node.description}</p>
+          {node.children.length > 0 && (
+            <ul class="tag-list card-links">
+              {node.children.map((child) => (
+                <li>
+                  <a class="sub" href={url(`/categories/${child.id}/`)}>
+                    {child.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .sub {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+</style>

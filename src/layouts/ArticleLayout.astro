@@ -1,0 +1,212 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CodeEnhancer from '../components/CodeEnhancer.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import TagList from '../components/TagList.astro';
+import { siteConfig } from '../site.config';
+import { formatDate, isoDate, url } from '../lib/urls';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Search filter label, e.g. "Blog", "Notes", "Projects". */
+  searchType: string;
+  schemaType: 'BlogPosting' | 'TechArticle' | 'CreativeWork';
+  breadcrumbs: { label: string; href?: string }[];
+  published: Date;
+  updated?: Date | undefined;
+  readingMinutes?: number;
+  category?: { id: string; title: string } | undefined;
+  tags?: string[];
+  tagBase?: string;
+  headings?: MarkdownHeading[];
+  cover?: ImageMetadata | undefined;
+  coverAlt?: string | undefined;
+  draft?: boolean;
+  /** Repository-relative source path, used for the "view source" link. */
+  sourcePath?: string | undefined;
+}
+
+const {
+  title,
+  description,
+  searchType,
+  schemaType,
+  breadcrumbs,
+  published,
+  updated,
+  readingMinutes,
+  category,
+  tags = [],
+  tagBase,
+  headings = [],
+  cover,
+  coverAlt,
+  draft,
+  sourcePath,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const author = siteConfig.author.name
+  ? { '@type': 'Person', name: siteConfig.author.name }
+  : { '@type': 'Organization', name: siteConfig.name };
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': schemaType,
+    headline: title,
+    description,
+    datePublished: published.toISOString(),
+    dateModified: (updated ?? published).toISOString(),
+    url: canonical,
+    mainEntityOfPage: canonical,
+    author,
+    publisher: { '@type': 'Organization', name: siteConfig.name },
+    keywords: tags.join(', ') || undefined,
+    ...(category ? { articleSection: category.title } : {}),
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  published={published}
+  modified={updated}
+  tags={tags}
+  image={cover ? cover.src : undefined}
+  imageAlt={cover ? coverAlt : undefined}
+  structuredData={structuredData}
+>
+  <div class="container page">
+    <Breadcrumbs items={breadcrumbs} />
+    <div class="with-sidebar">
+      <article data-pagefind-body={draft ? undefined : ''}>
+        <span hidden data-pagefind-filter="type">
+          {searchType}
+        </span>
+        {category && (
+          <span hidden data-pagefind-filter="category">
+            {category.title}
+          </span>
+        )}
+        <header class="article-header">
+          {draft && (
+            <p class="notice">
+              Draft: visible in development only, excluded from production builds.
+            </p>
+          )}
+          <div data-pagefind-ignore>
+            <slot name="eyebrow" />
+          </div>
+          <h1 data-pagefind-meta="title">{title}</h1>
+          <p class="lead">{description}</p>
+          <div class="meta" data-pagefind-ignore>
+            <span>
+              published <time datetime={isoDate(published)}>{formatDate(published)}</time>
+            </span>
+            {updated && updated.getTime() !== published.getTime() && (
+              <span>
+                updated <time datetime={isoDate(updated)}>{formatDate(updated)}</time>
+              </span>
+            )}
+            {readingMinutes && <span>{readingMinutes} min read</span>}
+            {category && (
+              <a href={url(`/categories/${category.id}/`)} class="category-link">
+                {category.title}
+              </a>
+            )}
+          </div>
+          <slot name="meta" />
+        </header>
+
+        {cover && coverAlt && (
+          <Image
+            src={cover}
+            alt={coverAlt}
+            class="cover"
+            widths={[720, 1080, 1440]}
+            sizes="(min-width: 64rem) 44rem, 100vw"
+            loading="eager"
+          />
+        )}
+
+        <CodeEnhancer>
+          <div class="prose">
+            <slot />
+          </div>
+        </CodeEnhancer>
+
+        <footer class="article-footer" data-pagefind-ignore>
+          <TagList tags={tags} base={tagBase} />
+          {sourcePath && (
+            <a class="mono source-link" href={`${siteConfig.repository}/blob/main/${sourcePath}`}>
+              view source / suggest a fix
+            </a>
+          )}
+        </footer>
+        <div data-pagefind-ignore>
+          <slot name="after" />
+        </div>
+      </article>
+      <aside class="sidebar" data-pagefind-ignore>
+        <TableOfContents headings={headings} />
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-header {
+    max-width: var(--prose-width);
+    margin-bottom: var(--space-6);
+  }
+
+  .lead {
+    font-size: var(--step-1);
+    color: var(--text-muted);
+  }
+
+  .category-link {
+    color: var(--accent);
+  }
+
+  .cover {
+    width: 100%;
+    max-width: var(--prose-width);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: var(--space-6);
+  }
+
+  .article-footer {
+    max-width: var(--prose-width);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+
+  .source-link {
+    font-size: 0.8125rem;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .sidebar {
+      display: block;
+    }
+  }
+</style>

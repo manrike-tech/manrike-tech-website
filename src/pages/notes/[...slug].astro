@@ -1,0 +1,57 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import { getCategories, getNotes, getPosts, noteKindLabel } from '../../lib/content';
+import { readingTime, relatedEntries } from '../../lib/content-utils';
+
+export const getStaticPaths = (async () => {
+  const notes = await getNotes();
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}) satisfies GetStaticPaths;
+
+const { note } = Astro.props;
+const { data } = note;
+const { Content, headings } = await render(note);
+
+const categories = await getCategories();
+const category = categories.byId.get(data.category.id);
+const crumbs = categories
+  .path(data.category.id)
+  .map((c) => ({ label: c.title, href: `/categories/${c.id}/` }));
+const relatedNotes = relatedEntries(
+  note,
+  await getNotes(),
+  data.relatedNotes.map((r) => r.id),
+  3,
+);
+const relatedPosts = relatedEntries(
+  note,
+  await getPosts(),
+  data.relatedPosts.map((r) => r.id),
+  2,
+);
+---
+
+<ArticleLayout
+  title={data.title}
+  description={data.description}
+  searchType="Notes"
+  schemaType="TechArticle"
+  breadcrumbs={[{ label: 'Notes', href: '/notes/' }, ...crumbs, { label: data.title }]}
+  published={data.published}
+  updated={data.updated}
+  readingMinutes={readingTime(note.body)}
+  category={category}
+  tags={data.tags}
+  headings={headings}
+  draft={data.draft}
+  sourcePath={note.filePath}
+>
+  <p slot="eyebrow" class="eyebrow">
+    {noteKindLabel[data.kind].toLowerCase()}
+  </p>
+  <Content />
+  <RelatedContent slot="after" notes={relatedNotes} posts={relatedPosts} />
+</ArticleLayout>

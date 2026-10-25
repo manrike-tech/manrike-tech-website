@@ -1,0 +1,15 @@
+title: Enterprise architecture & SRE
+description: Reliability engineering and architecture practices.
+category: architecture
+order: 90
+items:
+  - name: Google SRE books
+    url: https://sre.google/books/
+    description: Site Reliability Engineering, The Site Reliability Workbook and related books, readable online.
+    type: documentation
+    labels: [free, official]
+  - name: Architecture decision records
+    url: https://adr.github.io/
+    description: Overview of ADR formats, templates and tooling for documenting architecture decisions.
+    type: reference
+    labels: [free]

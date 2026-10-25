@@ -1,0 +1,33 @@
+---
+import type { Project } from '../lib/content';
+import { url } from '../lib/urls';
+import ProjectBadges from './ProjectBadges.astro';
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<article class="card">
+  <div class="meta">
+    <ProjectBadges environment={data.environment} status={data.status} draft={data.draft} />
+  </div>
+  <h3>
+    <a href={url(`/projects/${project.id}/`)}>{data.title}</a>
+  </h3>
+  <p>{data.description}</p>
+  {data.stack.length > 0 && (
+    <p class="stack mono" aria-label="Technology stack">
+      {data.stack.join(' · ')}
+    </p>
+  )}
+</article>
+
+<style>
+  .stack {
+    font-size: 0.8125rem;
+    color: var(--text-faint);
+  }
+</style>

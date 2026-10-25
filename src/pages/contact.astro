@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { siteConfig } from '../site.config';
+import { url } from '../lib/urls';
+
+const { github, linkedin, email } = siteConfig.social;
+const hasLinks = Boolean(github || linkedin || email);
+---
+
+<BaseLayout title="Contact" description={`How to get in touch with ${siteConfig.name}.`}>
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Contact' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ finger</p>
+      <h1>Contact</h1>
+      <p>
+        For questions about an article, corrections or professional enquiries, use one of the links
+        below. Corrections to content are also welcome as pull requests on the
+        <a href={siteConfig.repository}>site repository</a>.
+      </p>
+    </header>
+    {hasLinks ? <SocialLinks /> : <p class="empty-state">No contact channels configured yet.</p>}
+    <p class="muted more">
+      See also the <a href={url('/cv/')}>CV</a> and the <a href={url('/rss.xml')}>RSS feed</a>.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .more {
+    margin-top: var(--space-6);
+  }
+</style>

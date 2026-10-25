@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 10 760 150" width="760" height="150">
+  <style>
+    .box { fill: var(--bg-elevated, #15181c); stroke: var(--border-strong, #3a4149); stroke-width: 1.5; }
+    .accent { stroke: var(--accent, #5fd4a6); }
+    .t { fill: var(--text, #e4e7eb); font: 600 14px ui-monospace, Menlo, Consolas, monospace; }
+    .s { fill: var(--text-muted, #9ba4ae); font: 12px system-ui, sans-serif; }
+    .arrow { stroke: var(--text-faint, #7d8691); stroke-width: 1.5; fill: none; marker-end: url(#head); }
+    .head { fill: var(--text-faint, #7d8691); }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path class="head" d="M0 0 10 5 0 10z"/>
+    </marker>
+  </defs>
+
+  <rect class="box" x="10" y="60" width="150" height="90" rx="6"/>
+  <text class="t" x="85" y="95" text-anchor="middle">Git repository</text>
+  <text class="s" x="85" y="117" text-anchor="middle">Markdown · MDX · YAML</text>
+
+  <path class="arrow" d="M160 105h40"/>
+
+  <rect class="box" x="200" y="60" width="160" height="90" rx="6"/>
+  <text class="t" x="280" y="95" text-anchor="middle">astro build</text>
+  <text class="s" x="280" y="117" text-anchor="middle">schema validation</text>
+  <text class="s" x="280" y="134" text-anchor="middle">static HTML</text>
+
+  <path class="arrow" d="M360 105h40"/>
+
+  <rect class="box" x="400" y="60" width="150" height="90" rx="6"/>
+  <text class="t" x="475" y="95" text-anchor="middle">pagefind</text>
+  <text class="s" x="475" y="117" text-anchor="middle">search index</text>
+
+  <path class="arrow" d="M550 105h40"/>
+
+  <rect class="box accent" x="590" y="60" width="160" height="90" rx="6"/>
+  <text class="t" x="670" y="95" text-anchor="middle">Static hosting</text>
+  <text class="s" x="670" y="117" text-anchor="middle">HTML · CSS · small JS</text>
+
+  <text class="s" x="380" y="30" text-anchor="middle">GitHub Actions: check → lint → test → build → validate → deploy</text>
+  <path class="arrow" d="M200 40h360" stroke-dasharray="4 4"/>
+</svg>

@@ -1,0 +1,30 @@
+title: Windows & Windows Server
+description: Official documentation for Windows Server administration, PowerShell and hardening.
+category: windows
+order: 15
+items:
+  - name: Windows Server documentation
+    url: https://learn.microsoft.com/en-us/windows-server/
+    description: Microsoft Learn documentation for installing, configuring and managing Windows Server.
+    type: documentation
+    labels: [free, official]
+  - name: PowerShell documentation
+    url: https://learn.microsoft.com/en-us/powershell/
+    description: Reference and guides for PowerShell, its modules and scripting.
+    type: documentation
+    labels: [free, official]
+  - name: Windows commands reference
+    url: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands
+    description: Reference for built-in Windows command-line tools.
+    type: reference
+    labels: [free, official]
+  - name: Sysinternals
+    url: https://learn.microsoft.com/en-us/sysinternals/
+    description: Microsoft's suite of troubleshooting and diagnostics utilities, such as Process Explorer and Autoruns.
+    type: tool
+    labels: [free, official]
+  - name: Windows security baselines
+    url: https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/windows-security-baselines
+    description: Microsoft's recommended security configuration baselines for Windows.
+    type: reference
+    labels: [free, official]

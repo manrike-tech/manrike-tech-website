@@ -1,0 +1,31 @@
+---
+import type { Post } from '../lib/content';
+import { postKindLabel } from '../lib/content';
+import { readingTime } from '../lib/content-utils';
+import { formatDate, isoDate, url } from '../lib/urls';
+import TagList from './TagList.astro';
+
+interface Props {
+  post: Post;
+  headingLevel?: 'h2' | 'h3';
+}
+const { post, headingLevel = 'h3' } = Astro.props;
+const { data } = post;
+const Heading = headingLevel;
+---
+
+<article class="card">
+  <div class="meta">
+    <time datetime={isoDate(data.published)}>{formatDate(data.published)}</time>
+    <span>{readingTime(post.body)} min read</span>
+    <span class="badge">{postKindLabel[data.kind]}</span>
+    {data.draft && <span class="badge badge-warn">draft</span>}
+  </div>
+  <Heading>
+    <a href={url(`/blog/${post.id}/`)}>{data.title}</a>
+  </Heading>
+  <p>{data.description}</p>
+  <div class="card-links">
+    <TagList tags={data.tags} base="/blog/tag/" />
+  </div>
+</article>

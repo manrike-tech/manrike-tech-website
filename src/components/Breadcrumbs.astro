@@ -1,0 +1,76 @@
+---
+import { jsonLd } from '../lib/content-utils';
+import { url } from '../lib/urls';
+
+interface Props {
+  items: { label: string; href?: string }[];
+}
+
+const crumbs = [{ label: 'Home', href: '/' }, ...Astro.props.items];
+const structured = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...(c.href ? { item: new URL(url(c.href), Astro.site).href } : {}),
+  })),
+};
+---
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {crumbs.map((c, i) => (
+      <li>
+        {c.href && i < crumbs.length - 1 ? (
+          <a href={url(c.href)}>{c.label}</a>
+        ) : (
+          <span aria-current="page">{c.label}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={jsonLd(structured)} />
+<style>
+  .breadcrumbs {
+    margin-bottom: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: var(--text-faint);
+  }
+
+  /* Flex items ignore whitespace from the formatted markup. */
+  li {
+    display: inline-flex;
+    gap: var(--space-1);
+  }
+
+  li + li::before {
+    content: '/';
+    color: var(--text-faint);
+  }
+
+  a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  [aria-current] {
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+const production = projects.filter((p) => p.data.environment === 'production');
+const lab = projects.filter((p) => p.data.environment === 'lab');
+---
+
+<BaseLayout
+  title="Projects"
+  description="Infrastructure and software projects: production deployments and lab experiments, with architecture, stack and status."
+>
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Projects' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ ls ~/projects</p>
+      <h1>Projects</h1>
+      <p>
+        Each project documents the problem, architecture, stack, current status and known
+        limitations. Production deployments and lab experiments are listed separately.
+      </p>
+    </header>
+
+    <section class="section" aria-labelledby="production">
+      <div class="section-header">
+        <h2 id="production">Production</h2>
+      </div>
+      {production.length > 0 ? (
+        <div class="grid">
+          {production.map((p) => (
+            <ProjectCard project={p} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">No production projects published yet.</p>
+      )}
+    </section>
+
+    <section class="section" aria-labelledby="lab">
+      <div class="section-header">
+        <h2 id="lab">Lab experiments</h2>
+      </div>
+      {lab.length > 0 ? (
+        <div class="grid">
+          {lab.map((p) => (
+            <ProjectCard project={p} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">No lab experiments published yet.</p>
+      )}
+    </section>
+  </div>
+</BaseLayout>

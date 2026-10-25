@@ -1,0 +1,30 @@
+title: Azure, AWS & Microsoft 365
+description: Official documentation and architecture guidance for public cloud platforms.
+category: cloud
+order: 80
+items:
+  - name: Azure documentation
+    url: https://learn.microsoft.com/en-us/azure/
+    description: Microsoft Learn documentation for Azure services.
+    type: documentation
+    labels: [free, official]
+  - name: Azure Architecture Center
+    url: https://learn.microsoft.com/en-us/azure/architecture/
+    description: Reference architectures, design patterns and best practices for Azure.
+    type: reference
+    labels: [free, official]
+  - name: Microsoft 365 documentation
+    url: https://learn.microsoft.com/en-us/microsoft-365/
+    description: Administration and deployment documentation for Microsoft 365.
+    type: documentation
+    labels: [free, official]
+  - name: AWS documentation
+    url: https://docs.aws.amazon.com/
+    description: User guides and API references for AWS services.
+    type: documentation
+    labels: [free, official]
+  - name: AWS Well-Architected
+    url: https://aws.amazon.com/architecture/well-architected/
+    description: AWS framework for reviewing architectures across reliability, security, cost and more.
+    type: reference
+    labels: [free, official]

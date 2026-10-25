@@ -1,0 +1,51 @@
+---
+/**
+ * Text-based wordmark. Kept as plain text so it scales, stays accessible and
+ * can later be swapped for an SVG logo without touching other components.
+ */
+interface Props {
+  href?: string;
+}
+const { href } = Astro.props;
+---
+
+<a class="wordmark" href={href} aria-label="Manrike-Tech, home">
+  <span class="wm-prompt" aria-hidden="true">
+    ~/
+  </span>
+  <span class="wm-name">manrike</span>
+  <span class="wm-accent">-tech</span>
+  <span class="wm-cursor" aria-hidden="true"></span>
+</a>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .wordmark:hover {
+    color: var(--text);
+  }
+  .wm-prompt {
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+  .wm-accent {
+    color: var(--accent);
+  }
+  .wm-cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 0.15em;
+    margin-left: 0.1em;
+    background: var(--accent);
+    transform: translateY(0.05em);
+  }
+</style>

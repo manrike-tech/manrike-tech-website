@@ -1,0 +1,22 @@
+# Versión en español del CV. Sustituye los marcadores por información real y
+# cambia `placeholder: false` cuando todo esté revisado.
+placeholder: true
+headline: '[Marcador] Tu titular profesional, p. ej. "Ingeniero/a de infraestructura y DevOps"'
+summary: >-
+  [Marcador] Una breve presentación profesional: en qué trabajas, qué tipo de
+  sistemas diseñas y operas, y qué te importa en la ingeniería.
+location: ''
+skills:
+  - domain: Linux y virtualización
+    items: [Administración de sistemas Linux, systemd, Proxmox VE]
+  - domain: Redes y seguridad
+    items: [Redes, Firewalls / OPNsense, Bastionado de sistemas]
+  - domain: Contenedores y automatización
+    items: [Kubernetes, Talos Linux, Docker, Ansible, Infraestructura como código, CI/CD]
+  - domain: Nube y gobierno
+    items: [Microsoft Azure, AWS, Microsoft 365, ISO/IEC 27001]
+experience: []
+certifications: []
+education: []
+languages: []
+achievements: []

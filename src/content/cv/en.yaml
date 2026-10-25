@@ -1,0 +1,41 @@
+# English CV. Replace placeholders with real information and set
+# `placeholder: false` once everything below has been reviewed.
+# Empty lists hide their section when `placeholder` is false.
+placeholder: true
+headline: '[Placeholder] Your professional headline, e.g. "Infrastructure & DevOps Engineer"'
+summary: >-
+  [Placeholder] A short professional introduction: what you work on, the kind of
+  systems you build and operate, and what you care about in engineering.
+location: ''
+skills:
+  # Areas taken from the site's focus topics. Keep only what you can demonstrate.
+  - domain: Linux & virtualization
+    items: [Linux system administration, systemd, Proxmox VE]
+  - domain: Networking & security
+    items: [Networking, Firewalls / OPNsense, System hardening]
+  - domain: Containers & automation
+    items: [Kubernetes, Talos Linux, Docker, Ansible, Infrastructure as Code, CI/CD]
+  - domain: Cloud & governance
+    items: [Microsoft Azure, AWS, Microsoft 365, ISO/IEC 27001]
+experience: []
+#  - role: '[Role]'
+#    organization: '[Organization]'
+#    start: '2024'
+#    end: ''            # empty = present
+#    summary: '[One-line summary]'
+#    highlights:
+#      - '[Concrete, verifiable achievement]'
+certifications: []
+#  - name: '[Certification]'
+#    issuer: '[Issuer]'
+#    date: '2025'
+#    url: https://...   # official verification link, if available
+education: []
+#  - title: '[Degree or programme]'
+#    institution: '[Institution]'
+#    start: '2015'
+#    end: '2019'
+languages: []
+#  - name: Spanish
+#    level: Native
+achievements: []

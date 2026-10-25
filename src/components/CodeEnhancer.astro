@@ -1,0 +1,58 @@
+---
+/**
+ * Wraps rendered Markdown and adds a language label and a copy button to
+ * every code block. Without JavaScript the code blocks render unchanged.
+ */
+---
+
+<code-enhancer>
+  <slot />
+  <span class="visually-hidden" role="status" aria-live="polite" data-copy-status></span>
+</code-enhancer>
+
+<script>
+  class CodeEnhancer extends HTMLElement {
+    connectedCallback() {
+      const status = this.querySelector<HTMLElement>('[data-copy-status]');
+      for (const pre of this.querySelectorAll<HTMLPreElement>('pre')) {
+        if (pre.parentElement?.classList.contains('code-block')) continue;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block';
+        const lang = pre.dataset.language;
+        if (lang && !['plaintext', 'text', 'txt'].includes(lang)) wrapper.dataset.lang = lang;
+        pre.replaceWith(wrapper);
+        wrapper.append(pre);
+
+        if (!navigator.clipboard) continue;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'copy-button';
+        button.textContent = 'copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.addEventListener('click', async () => {
+          const text = (pre.querySelector('code') ?? pre).textContent ?? '';
+          try {
+            await navigator.clipboard.writeText(text.replace(/\n$/, ''));
+            button.textContent = 'copied';
+            if (status) status.textContent = 'Code copied to clipboard';
+          } catch {
+            button.textContent = 'failed';
+            if (status) status.textContent = 'Copy failed';
+          }
+          setTimeout(() => {
+            button.textContent = 'copy';
+            if (status) status.textContent = '';
+          }, 2000);
+        });
+        wrapper.append(button);
+      }
+    }
+  }
+  customElements.define('code-enhancer', CodeEnhancer);
+</script>
+
+<style>
+  code-enhancer {
+    display: block;
+  }
+</style>

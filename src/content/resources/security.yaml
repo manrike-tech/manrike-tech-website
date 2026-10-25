@@ -1,0 +1,25 @@
+title: Cybersecurity & hardening
+description: Hardening baselines, frameworks and auditing tools.
+category: security
+order: 70
+items:
+  - name: CIS Benchmarks
+    url: https://www.cisecurity.org/cis-benchmarks
+    description: Consensus-based secure configuration guidelines for operating systems, cloud and services.
+    type: reference
+    labels: [official]
+  - name: OWASP Top 10
+    url: https://owasp.org/www-project-top-ten/
+    description: Awareness document describing the most critical web application security risks.
+    type: reference
+    labels: [free, official]
+  - name: NIST Cybersecurity Framework
+    url: https://www.nist.gov/cyberframework
+    description: Framework for managing and reducing cybersecurity risk.
+    type: reference
+    labels: [free, official]
+  - name: Lynis
+    url: https://github.com/CISOfy/lynis
+    description: Security auditing and hardening tool for Linux and Unix-based systems.
+    type: tool
+    labels: [free, open-source]

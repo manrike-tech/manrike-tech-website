@@ -1,0 +1,11 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+playwright-report/
+test-results/
+public/
+# Markdown content is authored by hand; tables and prose are left as written.
+src/content/**/*.md
+src/content/**/*.mdx
+templates/

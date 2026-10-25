@@ -1,0 +1,25 @@
+title: Kubernetes, Talos & containers
+description: Documentation and certifications for containers and Kubernetes.
+category: containers
+order: 40
+items:
+  - name: Kubernetes documentation
+    url: https://kubernetes.io/docs/home/
+    description: Concepts, tasks, tutorials and API reference for Kubernetes.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: Talos Linux documentation
+    url: https://docs.siderolabs.com/talos/
+    description: Installation, configuration and operations guide for Talos Linux.
+    type: documentation
+    labels: [free, official]
+  - name: Docker documentation
+    url: https://docs.docker.com/
+    description: Guides and reference for Docker Engine, Compose and image builds.
+    type: documentation
+    labels: [free, official]
+  - name: Certified Kubernetes Administrator (CKA)
+    url: https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/
+    description: Performance-based Kubernetes administration certification from the Linux Foundation and CNCF.
+    type: certification
+    labels: [paid, official]

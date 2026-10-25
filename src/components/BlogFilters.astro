@@ -1,0 +1,74 @@
+---
+import { getCategories, getPosts } from '../lib/content';
+import { stripBase, url } from '../lib/urls';
+
+// Lists every category (and its ancestors) that has at least one post.
+const posts = await getPosts();
+const categories = await getCategories();
+const used = new Set<string>();
+for (const p of posts) for (const c of categories.path(p.data.category.id)) used.add(c.id);
+const options = categories.list
+  .filter((c) => used.has(c.id))
+  .sort((a, b) => a.title.localeCompare(b.title));
+
+const current = stripBase(Astro.url.pathname);
+const isCurrent = (href: string) =>
+  current === href || (href !== '/blog/' && current.startsWith(href));
+---
+
+<div class="blog-tools">
+  <form class="blog-search" action={url('/search/')} method="get" role="search">
+    <label class="visually-hidden" for="blog-search-input">
+      Search articles
+    </label>
+    <input
+      id="blog-search-input"
+      class="input"
+      type="search"
+      name="q"
+      placeholder="Search articles…"
+    />
+    <input type="hidden" name="type" value="Blog" />
+    <button class="button" type="submit">
+      Search
+    </button>
+  </form>
+  <nav aria-label="Filter by category">
+    <ul class="filter-bar">
+      <li>
+        <a
+          href={url('/blog/')}
+          aria-current={
+            current === '/blog/' || current.startsWith('/blog/page/') ? 'page' : undefined
+          }
+        >
+          all
+        </a>
+      </li>
+      {options.map((c) => (
+        <li>
+          <a
+            href={url(`/blog/category/${c.id}/`)}
+            aria-current={isCurrent(`/blog/category/${c.id}/`) ? 'page' : undefined}
+          >
+            {c.title}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a href={url('/blog/tags/')} aria-current={isCurrent('/blog/tags/') ? 'page' : undefined}>
+          #tags
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<style>
+  .blog-search {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    max-width: 32rem;
+  }
+</style>

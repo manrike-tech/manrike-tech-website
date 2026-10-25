@@ -1,0 +1,45 @@
+---
+import { url } from '../lib/urls';
+
+interface Props {
+  current: number;
+  total: number;
+  /** Route of page 1, e.g. "/blog/". Further pages live at `${base}page/N/`. */
+  base: string;
+}
+const { current, total, base } = Astro.props;
+const href = (n: number) => url(n === 1 ? base : `${base}page/${n}/`);
+---
+
+{total > 1 && (
+  <nav class="pagination" aria-label="Pagination">
+    {current > 1 ? (
+      <a class="button" href={href(current - 1)} rel="prev">
+        ← Newer
+      </a>
+    ) : (
+      <span />
+    )}
+    <span class="mono muted">
+      page {current} / {total}
+    </span>
+    {current < total ? (
+      <a class="button" href={href(current + 1)} rel="next">
+        Older →
+      </a>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}
+
+<style>
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    font-size: var(--step--1);
+  }
+</style>

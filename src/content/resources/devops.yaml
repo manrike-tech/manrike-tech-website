@@ -1,0 +1,25 @@
+title: DevOps & Infrastructure as Code
+description: Automation and provisioning tools.
+category: devops
+order: 50
+items:
+  - name: Ansible documentation
+    url: https://docs.ansible.com/
+    description: Documentation for Ansible, collections and the Ansible community packages.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: OpenTofu documentation
+    url: https://opentofu.org/docs/
+    description: Documentation for OpenTofu, the open-source infrastructure as code tool.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: Terraform documentation
+    url: https://developer.hashicorp.com/terraform/docs
+    description: HashiCorp's documentation for Terraform configuration language and CLI.
+    type: documentation
+    labels: [free, official]
+  - name: GitHub Actions documentation
+    url: https://docs.github.com/en/actions
+    description: Workflow syntax, runners and security hardening for GitHub Actions.
+    type: documentation
+    labels: [free, official]

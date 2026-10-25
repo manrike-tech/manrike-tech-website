@@ -1,0 +1,226 @@
+---
+import { navigation } from '../site.config';
+import { stripBase, url } from '../lib/urls';
+import Wordmark from './Wordmark.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+const current = stripBase(Astro.url.pathname);
+const isActive = (href: string) => current === href || current.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <Wordmark href={url('/')} />
+    <site-nav>
+      <button
+        class="menu-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        hidden
+      >
+        <span class="visually-hidden">Menu</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <path
+            d="M3 5h14M3 10h14M3 15h14"
+            stroke="currentColor"
+            stroke-width="1.6"
+            fill="none"
+          ></path>
+        </svg>
+      </button>
+      <nav id="primary-nav" aria-label="Primary">
+        <ul>
+          {navigation.map((item) => (
+            <li>
+              <a href={url(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </site-nav>
+    <div class="header-actions">
+      <a
+        class="icon-button"
+        href={url('/search/')}
+        aria-label="Search"
+        title="Search (press /)"
+        data-search-link
+      >
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
+          <circle
+            cx="8.5"
+            cy="8.5"
+            r="5.5"
+            stroke="currentColor"
+            stroke-width="1.6"
+            fill="none"
+          ></circle>
+          <path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="1.6"></path>
+        </svg>
+      </a>
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
+
+<script>
+  class SiteNav extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector<HTMLButtonElement>('.menu-button');
+      const nav = this.querySelector<HTMLElement>('nav');
+      if (!button || !nav) return;
+      button.hidden = false;
+      this.dataset.enhanced = '';
+      button.addEventListener('click', () => {
+        const open = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(open));
+      });
+      this.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+          button.setAttribute('aria-expanded', 'false');
+          button.focus();
+        }
+      });
+    }
+  }
+  customElements.define('site-nav', SiteNav);
+
+  // "/" jumps to search, unless the user is typing in a field.
+  document.addEventListener('keydown', (event) => {
+    const target = event.target as HTMLElement;
+    if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    const field = document.querySelector<HTMLInputElement>('#search-input');
+    event.preventDefault();
+    if (field) field.focus();
+    else document.querySelector<HTMLAnchorElement>('[data-search-link]')?.click();
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 3.75rem;
+    flex-wrap: wrap;
+  }
+
+  site-nav {
+    display: contents;
+  }
+
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--text);
+    background: var(--bg-elevated);
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--text);
+    box-shadow: inset 0 -2px 0 var(--accent);
+    border-radius: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: auto;
+  }
+
+  .menu-button,
+  .icon-button,
+  .header-actions :global(.icon-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .menu-button:hover,
+  .icon-button:hover {
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .menu-button[hidden] {
+    display: none;
+  }
+
+  /* Small screens: the menu collapses only once JavaScript has enhanced it. */
+  @media (max-width: 47.99rem) {
+    nav {
+      order: 10;
+      width: 100%;
+    }
+
+    site-nav[data-enhanced] nav {
+      display: none;
+    }
+
+    site-nav[data-enhanced]:has([aria-expanded='true']) nav {
+      display: block;
+      padding-bottom: var(--space-3);
+    }
+
+    nav ul {
+      flex-direction: column;
+    }
+
+    nav a[aria-current='page'] {
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+
+    .menu-button {
+      order: 3;
+    }
+
+    .header-actions {
+      order: 2;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .menu-button {
+      display: none !important;
+    }
+    nav {
+      margin-left: var(--space-4);
+    }
+  }
+</style>

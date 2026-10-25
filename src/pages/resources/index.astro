@@ -1,0 +1,202 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCategories, getResourceGroups } from '../../lib/content';
+import { url } from '../../lib/urls';
+
+const groups = await getResourceGroups();
+const categories = await getCategories();
+const types = [...new Set(groups.flatMap((g) => g.data.items.map((i) => i.type)))].sort();
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+---
+
+<BaseLayout
+  title="Resources"
+  description="Curated documentation, tools, repositories, courses and certifications, grouped by technology."
+>
+  <div class="container page">
+    <Breadcrumbs items={[{ label: 'Resources' }]} />
+    <header class="page-header">
+      <p class="eyebrow">$ cat ~/bookmarks</p>
+      <h1>Resources</h1>
+      <p>
+        Curated links to official documentation, tools and learning material. Each entry is marked
+        by purpose and, where accurate, as free, paid, open-source or official.
+      </p>
+    </header>
+
+    <nav class="toc-groups" aria-label="Resource groups">
+      <ul class="filter-bar">
+        {groups.map((g) => (
+          <li>
+            <a href={`#${g.id}`}>{g.data.title}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <resource-filter>
+      <fieldset class="type-filter" hidden>
+        <legend class="mono muted">filter by purpose</legend>
+        <label>
+          <input type="radio" name="resource-type" value="" checked /> all
+        </label>
+        {types.map((t) => (
+          <label>
+            <input type="radio" name="resource-type" value={t} /> {t}
+          </label>
+        ))}
+      </fieldset>
+
+      <div data-pagefind-body>
+        <span hidden data-pagefind-filter="type">
+          Resources
+        </span>
+        <h2 class="visually-hidden" data-pagefind-meta="title">
+          Resources
+        </h2>
+        {groups.length === 0 ? (
+          <p class="empty-state">No resources published yet.</p>
+        ) : (
+          groups.map((group) => {
+            const category = categories.byId.get(group.data.category.id);
+            return (
+              <section
+                class="section resource-group"
+                id={group.id}
+                aria-labelledby={`h-${group.id}`}
+              >
+                <div class="section-header">
+                  <h2 id={`h-${group.id}`}>{group.data.title}</h2>
+                  {category && <a href={url(`/categories/${category.id}/`)}>{category.title}</a>}
+                </div>
+                <p class="muted">{group.data.description}</p>
+                <ul class="resource-list">
+                  {group.data.items.map((item) => (
+                    <li data-type={item.type}>
+                      <h3 id={`${group.id}-${slugify(item.name)}`}>
+                        <a href={item.url} rel="noopener">
+                          {item.name}
+                        </a>
+                      </h3>
+                      <p>{item.description}</p>
+                      <div class="meta">
+                        <span class="badge badge-accent">{item.type}</span>
+                        {item.labels.map((l) => (
+                          <span class="badge">{l}</span>
+                        ))}
+                        <span class="host">{new URL(item.url).hostname}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })
+        )}
+        <p class="empty-state filter-empty" hidden>
+          No resources of this type.
+        </p>
+      </div>
+    </resource-filter>
+  </div>
+</BaseLayout>
+
+<script>
+  class ResourceFilter extends HTMLElement {
+    connectedCallback() {
+      const fieldset = this.querySelector<HTMLFieldSetElement>('.type-filter');
+      if (!fieldset) return;
+      fieldset.hidden = false;
+      fieldset.addEventListener('change', (event) => {
+        const value = (event.target as HTMLInputElement).value;
+        let visible = 0;
+        for (const item of this.querySelectorAll<HTMLElement>('[data-type]')) {
+          item.hidden = Boolean(value) && item.dataset.type !== value;
+          if (!item.hidden) visible++;
+        }
+        for (const group of this.querySelectorAll<HTMLElement>('.resource-group')) {
+          group.hidden = !group.querySelector('[data-type]:not([hidden])');
+        }
+        const empty = this.querySelector<HTMLElement>('.filter-empty');
+        if (empty) empty.hidden = visible > 0;
+      });
+    }
+  }
+  customElements.define('resource-filter', ResourceFilter);
+</script>
+
+<style>
+  .type-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .type-filter[hidden] {
+    display: none;
+  }
+
+  .type-filter legend {
+    padding-inline: var(--space-2);
+  }
+
+  .type-filter label {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .type-filter input {
+    accent-color: var(--accent);
+  }
+
+  .resource-group {
+    margin-top: var(--space-6);
+  }
+
+  .resource-list {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .resource-list li {
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+  }
+
+  .resource-list li[hidden] {
+    display: none;
+  }
+
+  .resource-list h3 {
+    font-size: var(--step-0);
+    margin-bottom: var(--space-1);
+  }
+
+  .resource-list p {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .host {
+    margin-left: auto;
+  }
+</style>

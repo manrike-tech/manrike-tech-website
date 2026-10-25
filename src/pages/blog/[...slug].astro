@@ -1,0 +1,57 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import { getCategories, getNotes, getPosts, postKindLabel } from '../../lib/content';
+import { readingTime, relatedEntries } from '../../lib/content-utils';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content, headings } = await render(post);
+
+const categories = await getCategories();
+const category = categories.byId.get(data.category.id);
+const relatedPosts = relatedEntries(
+  post,
+  await getPosts(),
+  data.relatedPosts.map((r) => r.id),
+  3,
+);
+const relatedNotes = relatedEntries(
+  post,
+  await getNotes(),
+  data.relatedNotes.map((r) => r.id),
+  2,
+);
+---
+
+<ArticleLayout
+  title={data.title}
+  description={data.description}
+  searchType="Blog"
+  schemaType="BlogPosting"
+  breadcrumbs={[{ label: 'Blog', href: '/blog/' }, { label: data.title }]}
+  published={data.published}
+  updated={data.updated}
+  readingMinutes={readingTime(post.body)}
+  category={category}
+  tags={data.tags}
+  tagBase="/blog/tag/"
+  headings={headings}
+  cover={data.cover}
+  coverAlt={data.coverAlt}
+  draft={data.draft}
+  sourcePath={post.filePath}
+>
+  <p slot="eyebrow" class="eyebrow">
+    {postKindLabel[data.kind].toLowerCase()}
+  </p>
+  <Content />
+  <RelatedContent slot="after" posts={relatedPosts} notes={relatedNotes} />
+</ArticleLayout>

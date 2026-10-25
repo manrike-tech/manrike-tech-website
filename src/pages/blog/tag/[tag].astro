@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BlogListing from '../../../components/BlogListing.astro';
+import { getPosts } from '../../../lib/content';
+import { tagCounts } from '../../../lib/content-utils';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return tagCounts(posts).map(({ tag }) => ({
+    params: { tag },
+    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+---
+
+<BlogListing
+  title={`#${tag}`}
+  metaTitle={`Articles tagged #${tag}`}
+  description={`Articles tagged “${tag}”.`}
+  posts={posts}
+  breadcrumbs={[
+    { label: 'Blog', href: '/blog/' },
+    { label: 'Tags', href: '/blog/tags/' },
+    { label: tag },
+  ]}
+/>

@@ -1,0 +1,126 @@
+# Category taxonomy shared by blog posts, notes, projects and resources.
+# Add a new category by appending an entry; no code changes are needed.
+#   id:     lowercase kebab-case, used in URLs (/categories/<id>/) and frontmatter
+#   parent: optional id of the parent category (creates the hierarchy)
+#   order:  sort order among siblings (lower first)
+
+- id: linux
+  title: Linux, Windows & System Administration
+  description: Linux and Windows Server administration, services, storage, users and packages.
+  order: 10
+- id: systemd
+  title: systemd
+  description: Units, timers, journald and service management.
+  parent: linux
+- id: shell
+  title: Shell & CLI
+  description: Bash, core utilities and command-line workflows.
+  parent: linux
+- id: windows
+  title: Windows & Windows Server
+  description: Windows Server roles, PowerShell, Active Directory and Windows hardening.
+  parent: linux
+
+- id: virtualization
+  title: Proxmox & Virtualization
+  description: Proxmox VE, KVM, storage backends, clustering and backups.
+  order: 20
+- id: proxmox
+  title: Proxmox VE
+  description: Proxmox Virtual Environment administration and automation.
+  parent: virtualization
+
+- id: networking
+  title: Networking & Firewalls
+  description: Routing, VLANs, DNS, VPNs and firewalls such as OPNsense and FortiGate.
+  order: 30
+- id: opnsense
+  title: OPNsense
+  description: OPNsense firewall configuration and operations.
+  parent: networking
+- id: fortigate
+  title: FortiGate
+  description: Fortinet FortiGate firewalls and FortiOS configuration.
+  parent: networking
+
+- id: containers
+  title: Kubernetes & Containers
+  description: Containers, Kubernetes, Talos Linux and cluster operations.
+  order: 40
+- id: kubernetes
+  title: Kubernetes
+  description: Cluster operations, workloads, networking and troubleshooting.
+  parent: containers
+- id: talos
+  title: Talos Linux
+  description: Immutable, API-managed Kubernetes operating system.
+  parent: containers
+
+- id: devops
+  title: DevOps & Infrastructure as Code
+  description: Ansible, CI/CD, GitOps and infrastructure automation.
+  order: 50
+- id: ansible
+  title: Ansible
+  description: Playbooks, roles, inventories and automation patterns.
+  parent: devops
+
+- id: self-hosted
+  title: Private Cloud & Self-Hosting
+  description: Homelab and self-hosted infrastructure design and operations.
+  order: 60
+
+- id: monitoring
+  title: Monitoring & Observability
+  description: Metrics, dashboards and alerting with Zabbix, Prometheus and Grafana.
+  order: 65
+- id: zabbix
+  title: Zabbix
+  description: Zabbix server, agents, templates and triggers.
+  parent: monitoring
+- id: prometheus
+  title: Prometheus
+  description: Prometheus metrics, exporters, PromQL and Alertmanager.
+  parent: monitoring
+- id: grafana
+  title: Grafana
+  description: Grafana dashboards, data sources and alerting.
+  parent: monitoring
+
+- id: security
+  title: Cybersecurity & Hardening
+  description: System hardening, OSINT, threat awareness and defensive practices.
+  order: 70
+- id: hardening
+  title: Hardening
+  description: Secure configuration baselines for systems and services.
+  parent: security
+- id: osint
+  title: OSINT
+  description: Open-source intelligence methodology and tooling.
+  parent: security
+
+- id: cloud
+  title: Azure, AWS & Microsoft 365
+  description: Public cloud services, identity and productivity platforms.
+  order: 80
+
+- id: architecture
+  title: Enterprise Architecture & SRE
+  description: Architecture decisions, reliability engineering and operations practices.
+  order: 90
+
+- id: governance
+  title: ISO 27000 & Security Governance
+  description: Information security management systems, policies and controls.
+  order: 100
+
+- id: learning
+  title: Learning Roadmaps & Certifications
+  description: Study plans, certification paths and learning resources.
+  order: 110
+
+- id: tools
+  title: Tools & References
+  description: Useful tools, command references and troubleshooting notes.
+  order: 120

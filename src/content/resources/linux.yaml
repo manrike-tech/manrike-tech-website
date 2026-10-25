@@ -1,0 +1,25 @@
+title: Linux & system administration
+description: Reference documentation for Linux administration and systemd.
+category: linux
+order: 10
+items:
+  - name: ArchWiki
+    url: https://wiki.archlinux.org/
+    description: Detailed, well-maintained wiki whose articles apply far beyond Arch Linux.
+    type: documentation
+    labels: [free]
+  - name: Linux man-pages project
+    url: https://man7.org/linux/man-pages/
+    description: Online version of the Linux manual pages for system calls, library functions and commands.
+    type: reference
+    labels: [free, official]
+  - name: systemd documentation
+    url: https://systemd.io/
+    description: Upstream documentation, design notes and specifications for systemd.
+    type: documentation
+    labels: [free, official, open-source]
+  - name: The Debian Administrator's Handbook
+    url: https://debian-handbook.info/
+    description: Free book covering Debian system administration from installation to services and security.
+    type: documentation
+    labels: [free]

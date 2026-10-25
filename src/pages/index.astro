@@ -1,0 +1,290 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import PostCard from '../components/PostCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getCategories, getNotes, getPosts, getProjects, getResourceGroups } from '../lib/content';
+import { siteConfig } from '../site.config';
+import { url } from '../lib/urls';
+
+const posts = await getPosts();
+const notes = await getNotes();
+const projects = await getProjects();
+const resourceCount = (await getResourceGroups()).reduce((n, g) => n + g.data.items.length, 0);
+const categories = await getCategories();
+
+const featured = posts.filter((p) => p.data.featured);
+const featuredPosts = (featured.length > 0 ? featured : posts).slice(0, 3);
+const recentNotes = notes.slice(0, 4);
+const highlighted = projects.filter((p) => p.data.featured).slice(0, 2);
+
+const all = [...posts, ...notes, ...projects];
+const areas = categories.tree.map((area) => {
+  const ids = categories.descendants(area.id);
+  return { ...area, count: all.filter((e) => ids.has(e.data.category.id)).length };
+});
+
+const listing = [
+  {
+    name: 'blog/',
+    href: '/blog/',
+    info: `${posts.length} article${posts.length === 1 ? '' : 's'}`,
+  },
+  { name: 'notes/', href: '/notes/', info: `${notes.length} note${notes.length === 1 ? '' : 's'}` },
+  { name: 'resources/', href: '/resources/', info: `${resourceCount} links` },
+  {
+    name: 'projects/',
+    href: '/projects/',
+    info: `${projects.length} project${projects.length === 1 ? '' : 's'}`,
+  },
+  { name: 'cv.md', href: '/cv/', info: 'about' },
+];
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    description: siteConfig.description,
+    url: new URL(url('/'), Astro.site).href,
+  },
+];
+---
+
+<BaseLayout structuredData={structuredData}>
+  <div class="container page">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">$ cat README.md</p>
+        <h1 id="hero-title">Infrastructure, DevOps and security engineering, written down.</h1>
+        <p class="intro">
+          {siteConfig.name} is a technical notebook and portfolio: tutorials and troubleshooting
+          write-ups, a searchable knowledge base, curated references and documented projects across
+          Linux and Windows, virtualization, networking and firewalls, Kubernetes, automation,
+          monitoring, security and cloud.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href={url('/blog/')}>
+            Read the blog
+          </a>
+          <a class="button" href={url('/notes/')}>
+            Browse notes
+          </a>
+          <a class="button" href={url('/cv/')}>
+            About / CV
+          </a>
+        </div>
+      </div>
+
+      <nav class="terminal" aria-label="Site sections">
+        <div class="terminal-bar" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="terminal-line" aria-hidden="true">
+          <span class="prompt">~$</span> ls -l
+        </p>
+        <ul>
+          {listing.map((item) => (
+            <li>
+              <a href={url(item.href)}>{item.name}</a>
+              <span>{item.info}</span>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </section>
+
+    <section class="section" aria-labelledby="featured">
+      <div class="section-header">
+        <h2 id="featured">Featured articles</h2>
+        <a href={url('/blog/')}>all articles →</a>
+      </div>
+      {featuredPosts.length > 0 ? (
+        <div class="grid">
+          {featuredPosts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">No articles published yet.</p>
+      )}
+    </section>
+
+    <div class="two-col">
+      <section class="section" aria-labelledby="recent-notes">
+        <div class="section-header">
+          <h2 id="recent-notes">Recently updated notes</h2>
+          <a href={url('/notes/')}>knowledge base →</a>
+        </div>
+        {recentNotes.length > 0 ? (
+          <div class="stack">
+            {recentNotes.map((note) => (
+              <NoteCard note={note} compact />
+            ))}
+          </div>
+        ) : (
+          <p class="empty-state">No notes published yet.</p>
+        )}
+      </section>
+
+      <section class="section" aria-labelledby="highlighted-projects">
+        <div class="section-header">
+          <h2 id="highlighted-projects">Projects</h2>
+          <a href={url('/projects/')}>all projects →</a>
+        </div>
+        {highlighted.length > 0 ? (
+          <div class="stack">
+            {highlighted.map((project) => (
+              <ProjectCard project={project} />
+            ))}
+          </div>
+        ) : (
+          <p class="empty-state">No projects published yet.</p>
+        )}
+      </section>
+    </div>
+
+    <section class="section" aria-labelledby="areas">
+      <div class="section-header">
+        <h2 id="areas">Technology areas</h2>
+        <a href={url('/categories/')}>all categories →</a>
+      </div>
+      <ul class="areas">
+        {areas.map((area) => (
+          <li>
+            <a href={url(`/categories/${area.id}/`)}>
+              <span class="area-title">{area.title}</span>
+              <span class="area-count mono">{area.count}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+    padding-block: var(--space-5) var(--space-4);
+  }
+
+  @media (min-width: 64rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 1fr);
+      gap: var(--space-7);
+    }
+  }
+
+  .hero h1 {
+    max-width: 22ch;
+  }
+
+  .intro {
+    font-size: var(--step-1);
+    color: var(--text-muted);
+    max-width: 40rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .terminal {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-inset);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .terminal-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: var(--space-3);
+  }
+
+  .terminal-bar span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-strong);
+  }
+
+  .terminal-line {
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .prompt {
+    color: var(--accent);
+  }
+
+  .terminal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .terminal li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-1) 0;
+  }
+
+  .terminal li span {
+    color: var(--text-faint);
+  }
+
+  .two-col {
+    display: grid;
+    gap: 0 var(--space-6);
+  }
+
+  @media (min-width: 56rem) {
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .areas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .areas a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  .areas a:hover {
+    border-color: var(--accent);
+  }
+
+  .area-count {
+    color: var(--text-faint);
+    font-size: 0.8125rem;
+  }
+</style>

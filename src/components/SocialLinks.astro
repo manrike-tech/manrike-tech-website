@@ -1,0 +1,36 @@
+---
+import { siteConfig } from '../site.config';
+
+// Only configured links are rendered; empty values stay private.
+const { github, linkedin, email } = siteConfig.social;
+const links = [
+  github && { label: 'GitHub', href: github },
+  linkedin && { label: 'LinkedIn', href: linkedin },
+  email && { label: 'Email', href: `mailto:${email}` },
+].filter((l): l is { label: string; href: string } => Boolean(l));
+---
+
+{links.length > 0 && (
+  <ul class="social-links">
+    {links.map((l) => (
+      <li>
+        <a href={l.href} rel={l.href.startsWith('http') ? 'me noopener' : undefined}>
+          {l.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+</style>
